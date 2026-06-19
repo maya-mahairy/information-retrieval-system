@@ -1,0 +1,59 @@
+# Python cache
+
+**pycache**/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+
+.ipynb_checkpoints/
+
+# VS Code
+
+.vscode/
+
+# System files
+
+.DS_Store
+Thumbs.db
+
+# Large generated data files
+
+data/hf_cache/
+data/ir_datasets_cache/
+data/tmp/
+data/raw/
+data/processed/
+data/indexes/
+
+# Generated outputs
+
+outputs/evaluation/
+outputs/charts/
+
+# Large database and index artifacts
+
+*.sqlite
+*.db
+*.npz
+*.npy
+*.joblib
+*.jsonl
+*.arrow
+
+# Logs
+
+*.log
+
+# Temporary files
+
+*.tmp
+*.bak
