@@ -289,11 +289,11 @@ The project can regenerate these files using the preparation, indexing, evaluati
 
 | Member   | Responsibility                                |
 | -------- | --------------------------------------------- |
-| Member 1 | Dataset preparation and preprocessing         |
-| Member 2 | TF-IDF and BM25 indexing/search               |
-| Member 3 | Hybrid retrieval and query refinement         |
-| Member 4 | Evaluation and charts                         |
-| Member 5 | Streamlit UI, documentation, and final report |
+| Shdn | Dataset preparation and preprocessing         |
+| Khaled | TF-IDF and BM25 indexing/search               |
+| Maya | Hybrid retrieval and query refinement         |
+| Mahmod | Evaluation and charts                         |
+| Sami | Streamlit UI, documentation, and final report |
 
 ## Conclusion
 
