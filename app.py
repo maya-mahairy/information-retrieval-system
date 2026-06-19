@@ -19,6 +19,7 @@ from services.hybrid_serial_search_service import HybridSerialSearchService
 from services.hybrid_parallel_search_service import HybridParallelSearchService
 from services.query_refinement_service import QueryRefinementService
 from services.refined_bm25_search_service import RefinedBM25SearchService
+from services.result_clustering_service import ResultClusteringService
 
 
 st.set_page_config(
@@ -187,6 +188,7 @@ def render_result_card(result: dict, fallback_rank: int):
 
     short_preview_length = 350
     short_preview = text[:short_preview_length]
+
     if len(text) > short_preview_length:
         short_preview += "..."
 
@@ -258,6 +260,53 @@ def render_result_card(result: dict, fallback_rank: int):
                 if result.get("added_terms"):
                     st.markdown("**Added Terms**")
                     st.json(result.get("added_terms"))
+
+
+def render_result_clusters(results, cluster_count, cluster_result_count):
+    clustering_service = ResultClusteringService(max_clusters=cluster_count)
+
+    results_to_cluster = results[:cluster_result_count]
+
+    cluster_output = clustering_service.cluster_results(
+        results=results_to_cluster,
+        max_clusters=cluster_count,
+    )
+
+    st.subheader("Search Result Clustering")
+    st.caption(
+        "The top retrieved documents are grouped according to textual similarity."
+    )
+
+    if cluster_output["cluster_count"] == 0:
+        st.info(cluster_output["message"])
+        return
+
+    for cluster in cluster_output["clusters"]:
+        with st.expander(
+            f"Cluster {cluster['cluster_id']}: {cluster['label']} "
+            f"({cluster['size']} documents)",
+            expanded=False,
+        ):
+            if cluster["top_terms"]:
+                st.markdown(
+                    "**Top Terms:** "
+                    + ", ".join(f"`{term}`" for term in cluster["top_terms"])
+                )
+
+            for document in cluster["documents"][:8]:
+                title = document.get("title") or "Untitled Document"
+                rank = document.get("rank")
+                score = document.get("score")
+                stance = document.get("stance") or "N/A"
+
+                st.markdown(f"**Rank {rank}: {title}**")
+
+                details = f"Score: {score:.4f}" if score is not None else "Score: N/A"
+                details += f" | Stance: {stance}"
+
+                st.caption(details)
+
+
 def render_dataset_info():
     dataset_info = load_json_file(DATASET_INFO_PATH)
 
@@ -280,9 +329,7 @@ def render_dataset_info():
         ]
 
         shown_any = False
-
         cols = st.columns(4)
-
         metric_index = 0
 
         for key in useful_keys:
@@ -353,7 +400,9 @@ def render_charts():
 
 def main():
     st.title("🔎 Information Retrieval System — IR Project 2026")
-    st.caption("TF-IDF, BM25, Hybrid Retrieval, Query Refinement, and Evaluation Dashboard")
+    st.caption(
+        "TF-IDF, BM25, Hybrid Retrieval, Query Refinement, and Evaluation Dashboard"
+    )
 
     sidebar = st.sidebar
 
@@ -405,7 +454,31 @@ def main():
     )
 
     sidebar.divider()
+    sidebar.subheader("Result Analysis")
 
+    enable_result_clustering = sidebar.checkbox(
+        "Enable Result Clustering",
+        value=False,
+        help="Group the top retrieved documents into topic-based clusters.",
+    )
+
+    cluster_count = sidebar.slider(
+        "Number of Clusters",
+        min_value=2,
+        max_value=5,
+        value=3,
+        step=1,
+    )
+
+    cluster_result_count = sidebar.slider(
+        "Results to Cluster",
+        min_value=10,
+        max_value=50,
+        value=20,
+        step=5,
+    )
+
+    sidebar.divider()
     sidebar.subheader("BM25 Parameters")
 
     k1 = sidebar.slider(
@@ -427,7 +500,6 @@ def main():
     )
 
     sidebar.divider()
-
     sidebar.subheader("Hybrid Parameters")
 
     hybrid_serial_alpha = sidebar.slider(
@@ -513,6 +585,14 @@ def main():
                         for index, result in enumerate(results, start=1):
                             render_result_card(result, fallback_rank=index)
 
+                        if enable_result_clustering and results:
+                            st.markdown("---")
+                            render_result_clusters(
+                                results=results,
+                                cluster_count=cluster_count,
+                                cluster_result_count=cluster_result_count,
+                            )
+
                     except Exception as error:
                         st.error("Search failed.")
                         st.exception(error)
@@ -542,14 +622,20 @@ def main():
             st.markdown("#### Corrections")
 
             if refinement["corrections"]:
-                st.dataframe(pd.DataFrame(refinement["corrections"]), use_container_width=True)
+                st.dataframe(
+                    pd.DataFrame(refinement["corrections"]),
+                    use_container_width=True,
+                )
             else:
                 st.info("No spelling corrections were needed.")
 
             st.markdown("#### Added Terms")
 
             if refinement["added_terms"]:
-                st.dataframe(pd.DataFrame(refinement["added_terms"]), use_container_width=True)
+                st.dataframe(
+                    pd.DataFrame(refinement["added_terms"]),
+                    use_container_width=True,
+                )
             else:
                 st.info("No synonym expansion terms were added.")
 
