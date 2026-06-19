@@ -234,32 +234,32 @@ pip install -r requirements.txt
 Prepare the dataset:
 
 ```bash
-python prepare_dataset.py
+python scripts/prepare_dataset.py
 ```
 
 Build indexes:
 
 ```bash
-python build_tfidf_index.py
-python build_bm25_index.py
+python scripts/build_tfidf_index.py
+python scripts/build_bm25_index.py
 ```
 
 Optional embedding index:
 
 ```bash
-python build_embedding_index.py --limit 1000 --batch-size 32
+python scripts/build_embedding_index.py --limit 1000 --batch-size 32
 ```
 
 Run full evaluation:
 
 ```bash
-python evaluate_models.py --models tfidf bm25 hybrid_serial hybrid_parallel bm25_refined_corrected bm25_refined_expanded --top-k 100
+python scripts/evaluate_models.py --models tfidf bm25 hybrid_serial hybrid_parallel bm25_refined_corrected bm25_refined_expanded --top-k 100
 ```
 
 Generate charts:
 
 ```bash
-python generate_evaluation_charts.py
+python scripts/generate_evaluation_charts.py
 ```
 
 Run Streamlit UI:

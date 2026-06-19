@@ -77,7 +77,7 @@ JSONL files that every retrieval/evaluation service ultimately reads
 
 Depends on: `services/dataset_service.py`, `services/preprocessing_service.py`,
 `config.py`.
-Called by: `prepare_dataset.py`.
+Called by: `scripts/prepare_dataset.py`.
 
 ## `services/tfidf_search_service.py`
 
@@ -175,7 +175,7 @@ model in the qrels query set:
 
 Depends on: every retrieval service, `PROCESSED_QUERIES_PATH`,
 `QRELS_PATH`, evaluation output paths from `config.py`.
-Called by: `evaluate_models.py`.
+Called by: `scripts/evaluate_models.py`.
 
 ## `services/evaluation_chart_service.py`
 
@@ -186,9 +186,9 @@ matplotlib, saving each as a PNG under `outputs/charts/`.
 
 Depends on: `EVALUATION_SUMMARY_PATH` and the five chart output paths from
 `config.py`, `matplotlib`.
-Called by: `generate_evaluation_charts.py`.
+Called by: `scripts/generate_evaluation_charts.py`.
 
-## `evaluate_models.py`
+## `scripts/evaluate_models.py`
 
 CLI entry point for running evaluation. Parses `--models` (defaults to
 `tfidf`, `bm25`, `hybrid_serial`, `hybrid_parallel`) and `--top-k` (default
@@ -196,12 +196,12 @@ CLI entry point for running evaluation. Parses `--models` (defaults to
 
 Usage: `python evaluate_models.py --models bm25 hybrid_serial --top-k 100`
 
-## `generate_evaluation_charts.py`
+## `scripts/generate_evaluation_charts.py`
 
 CLI entry point that calls
 `services.evaluation_chart_service.generate_evaluation_charts()` to
 (re)generate the five comparison PNGs from the current
-`evaluation_summary.json`. Run this after `evaluate_models.py` whenever the
+`evaluation_summary.json`. Run this after `scripts/evaluate_models.py` whenever the
 summary changes.
 
 Usage: `python generate_evaluation_charts.py`
