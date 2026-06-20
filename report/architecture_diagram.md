@@ -1,57 +1,31 @@
 ```mermaid
-flowchart TD
+flowchart LR
 
     USER["User / Evaluator"]
-    UI["Streamlit UI<br/>app.py"]
 
-    subgraph OFFLINE["1. Offline Data Preparation"]
-        DS["Dataset Service<br/>dataset_service.py"]
-        PRE["Preprocessing Service<br/>preprocessing_service.py"]
-        DPREP["Dataset Preparation<br/>dataset_preparation_service.py"]
-        BUILD["Index Building Scripts<br/>TF-IDF · BM25 · Embedding"]
-        STORE["Indexes + Document Store<br/>data/indexes<br/>document_store.sqlite"]
+    PREP["1. Offline Data Preparation<br/>Dataset Loading<br/>Preprocessing<br/>Index Building"]
 
-        DS --> PRE
-        PRE --> DPREP
-        DPREP --> BUILD
-        BUILD --> STORE
-    end
+    STORE["Indexes + Document Store<br/>TF-IDF · BM25 · Embeddings<br/>SQLite Document Store"]
 
-    subgraph ONLINE["2. Online Search Flow"]
-        QR["Query Refinement<br/>query_refinement_service.py"]
-        RET["Retrieval Services<br/>TF-IDF · BM25 · Hybrid · Refined BM25"]
-        ANALYSIS["Post-Retrieval Analysis<br/>Result Clustering · Topic Detection"]
-        RESULTS["Displayed Results<br/>Ranked Results · Clusters · Topic Terms"]
+    SEARCH["2. Search Application<br/>Streamlit UI<br/>Retrieval Services<br/>Query Refinement"]
 
-        QR --> RET
-        RET --> ANALYSIS
-        RET --> RESULTS
-        ANALYSIS --> RESULTS
-    end
+    ANALYSIS["3. Post-Retrieval Analysis<br/>Result Clustering<br/>Topic Detection"]
 
-    subgraph EVAL["3. Evaluation and Reporting"]
-        EV["Evaluation Service<br/>Precision@10 · Recall@100 · MAP@100 · nDCG@10"]
-        CHARTS["Chart Service<br/>Metric Comparison Charts"]
-        OUT["Evaluation Outputs<br/>outputs/evaluation<br/>outputs/charts"]
+    RESULTS["Displayed Results<br/>Ranked Results<br/>Clusters<br/>Topic Terms"]
 
-        EV --> CHARTS
-        EV --> OUT
-        CHARTS --> OUT
-    end
+    EVAL["4. Evaluation & Reporting<br/>Precision@10 · Recall@100<br/>MAP@100 · nDCG@10<br/>Charts"]
 
-    subgraph ACADEMIC["4. Academic Demonstration Layer"]
-        NB["Jupyter Notebook<br/>Academic Demo & Evaluation<br/>notebooks/01_ir_project_demo_and_evaluation.ipynb"]
-    end
+    NOTEBOOK["Jupyter Notebook<br/>Academic Demo & Evaluation<br/>Explains and verifies the pipeline"]
 
-    USER --> UI
-    UI --> QR
-    UI --> RET
-    STORE --> RET
-    RESULTS --> UI
+    PREP --> STORE
+    STORE --> SEARCH
+    USER --> SEARCH
+    SEARCH --> RESULTS
+    SEARCH --> ANALYSIS
+    ANALYSIS --> RESULTS
 
-    RET --> EV
+    SEARCH --> EVAL
 
-    NB -. "demonstrates services" .-> PRE
-    NB -. "demonstrates retrieval" .-> RET
-    NB -. "reads evaluation results" .-> OUT
+    NOTEBOOK -. reads results and charts .-> EVAL
+    NOTEBOOK -. demonstrates examples .-> SEARCH
 ```
