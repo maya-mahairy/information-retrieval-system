@@ -20,6 +20,8 @@ from services.hybrid_parallel_search_service import HybridParallelSearchService
 from services.query_refinement_service import QueryRefinementService
 from services.refined_bm25_search_service import RefinedBM25SearchService
 from services.result_clustering_service import ResultClusteringService
+from services.topic_detection_service import TopicDetectionService
+
 
 
 st.set_page_config(
@@ -73,6 +75,9 @@ def load_refined_expanded_service():
 def load_query_refinement_service():
     return QueryRefinementService()
 
+@st.cache_resource(show_spinner=False)
+def load_topic_detection_service():
+    return TopicDetectionService()
 
 def load_json_file(path: Path):
     if not path.exists():
@@ -261,7 +266,50 @@ def render_result_card(result: dict, fallback_rank: int):
                     st.markdown("**Added Terms**")
                     st.json(result.get("added_terms"))
 
+def render_topic_detection(query_text, results, topic_terms_count, model_label):
+    topic_service = load_topic_detection_service()
 
+    topic_output = topic_service.detect_topic(
+        query_text=query_text,
+        results=results,
+        top_n=topic_terms_count,
+    )
+
+    st.subheader("Topic Detection")
+    st.caption(
+        "The system extracts the main topic terms from the query and the retrieved documents."
+    )
+
+    if not topic_output["top_terms"]:
+        st.info(topic_output["message"])
+        return
+
+    st.markdown(f"**Detected Topic:** `{topic_output['topic_label']}`")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("Retrieval Model", model_label)
+
+    with col2:
+        st.metric("Documents Analyzed", topic_output["document_count"])
+
+    st.caption(
+        "Topic Extraction Method: TF-IDF term weighting over the retrieved results. "
+        "This is a post-retrieval analysis step, not the retrieval model itself."
+    )
+
+    topic_rows = []
+
+    for item in topic_output["top_terms"]:
+        topic_rows.append(
+            {
+                "Term": item["term"],
+                "Score": item["score"],
+            }
+        )
+
+    st.dataframe(pd.DataFrame(topic_rows), use_container_width=True)
 def render_result_clusters(results, cluster_count, cluster_result_count):
     clustering_service = ResultClusteringService(max_clusters=cluster_count)
 
@@ -477,7 +525,19 @@ def main():
         value=20,
         step=5,
     )
+    enable_topic_detection = sidebar.checkbox(
+    "Enable Topic Detection",
+    value=False,
+    help="Extract the main topic terms from the query and top retrieved documents.",
+)
 
+    topic_terms_count = sidebar.slider(
+    "Topic Terms Count",
+    min_value=5,
+    max_value=20,
+    value=10,
+    step=1,
+)
     sidebar.divider()
     sidebar.subheader("BM25 Parameters")
 
@@ -584,6 +644,15 @@ def main():
 
                         for index, result in enumerate(results, start=1):
                             render_result_card(result, fallback_rank=index)
+
+
+
+                        render_topic_detection(
+    query_text=query_text,
+    results=results,
+    topic_terms_count=topic_terms_count,
+    model_label=model_label,
+)   
 
                         if enable_result_clustering and results:
                             st.markdown("---")

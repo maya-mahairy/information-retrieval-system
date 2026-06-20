@@ -44,6 +44,15 @@ class ResultClusteringService:
             requested_clusters=max_clusters,
         )
         extra_stop_words = {
+            "new",
+"old",
+"know",
+"want",
+"need",
+"good",
+"bad",
+"yes",
+"no",
     "http",
     "https",
     "www",
