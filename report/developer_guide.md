@@ -133,3 +133,34 @@ Usage:
 ```bash
 python scripts/generate_evaluation_charts.py
 ```
+
+---
+
+### Add this section after `scripts/generate_evaluation_charts.py`
+
+## Academic Notebook
+
+## `notebooks/01_ir_project_demo_and_evaluation.ipynb`
+
+This notebook does not implement new logic. It reuses the existing services and already-generated outputs to present the project academically, step by step, for course evaluation purposes.
+
+It:
+
+* Reads `data/processed/dataset_info.json` and shows `documents_count`, `queries_count`, `qrels_count`, and `unique_qrel_queries_count`.
+* Calls `services.preprocessing_service.preprocess_text(...)` on a sample query to show normalization, tokenization, and cleaned text.
+* Loads `BM25SearchService` and runs a sample search to show the top retrieved titles, scores, and stances.
+* Loads `QueryRefinementService` and runs `refine_query(...)` on a misspelled query to show spelling correction and synonym expansion.
+* Reads `outputs/evaluation/evaluation_summary.json` and displays it as a pandas table, showing all 6 evaluated models with `evaluated_queries = 49` and `failed_queries_count = 0`.
+* Displays the five evaluation charts from `outputs/charts/`.
+* Demonstrates `ResultClusteringService` and `TopicDetectionService` on the BM25 results obtained earlier in the notebook.
+
+Depends on: `config.py` paths, the preprocessing service, the BM25 search service, the query refinement service, the post-retrieval analysis services, and the evaluation/chart outputs already produced by `scripts/evaluate_models.py` and `scripts/generate_evaluation_charts.py`.
+
+Called by: nobody. It is opened manually by a developer or evaluator through Jupyter, not part of the Streamlit runtime or any service-to-service call chain.
+
+Usage:
+
+```bash
+conda activate ir_env
+jupyter notebook
+```

@@ -340,6 +340,9 @@ IR_Project_2026/
 │   ├── evaluation/
 │   └── charts/
 │
+├── notebooks/
+│   └── 01_ir_project_demo_and_evaluation.ipynb
+│
 └── report/
     ├── architecture_diagram.md
     ├── soa_explanation.md
@@ -375,6 +378,33 @@ Examples:
 13_architecture_diagram.png
 14_result_clustering.png
 15_topic_detection.png
+```
+
+---
+
+## Jupyter Notebook
+
+The project includes one academic notebook:
+
+```text
+notebooks/01_ir_project_demo_and_evaluation.ipynb
+```
+
+This notebook is **not a replacement for the Streamlit UI**. It is an academic file used to demonstrate, verify, and explain the project pipeline step by step for course evaluation purposes: dataset summary, preprocessing demo, BM25 search demo, query refinement demo, evaluation summary, charts, result clustering, and topic detection.
+
+It only reads existing services and already-generated outputs (processed dataset, prebuilt indexes, evaluation summary, charts). It does not modify any service code and does not run a full evaluation.
+
+To run it:
+
+```bash
+conda activate ir_env
+jupyter notebook
+```
+
+Then open:
+
+```text
+notebooks/01_ir_project_demo_and_evaluation.ipynb
 ```
 
 ---

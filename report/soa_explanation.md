@@ -67,3 +67,22 @@ scripts/build_bm25_index.py
 scripts/build_embedding_index.py
 scripts/prepare_dataset.py
 ```
+
+---
+
+### Add this section after the `Post-Retrieval Analysis Services` section
+
+**Academic Demonstration Layer**
+
+* `notebooks/01_ir_project_demo_and_evaluation.ipynb` — is **not** an independent service for the end user. It is a documentation/verification layer sitting on top of the existing services.
+
+It does not retrieve documents, refine queries, cluster results, or detect topics itself. Instead, it imports and calls the same services `app.py` uses, and reads the same generated outputs `app.py` reads:
+
+* `services/preprocessing_service.py` — to demonstrate text normalization and cleaning.
+* `services/bm25_search_service.py` — to demonstrate a live BM25 search.
+* `services/query_refinement_service.py` — to demonstrate spelling correction and synonym expansion.
+* `outputs/evaluation/evaluation_summary.json` — to display the already-computed evaluation table for all 6 models.
+* `outputs/charts/*.png` — to display the already-generated comparison charts.
+* `services/result_clustering_service.py` and `services/topic_detection_service.py` — to demonstrate post-retrieval analysis on the BM25 results obtained inside the notebook.
+
+Because the notebook only calls services and reads outputs that already exist, it does not add a new node to the Online Search Flow, the Offline Data Preparation Flow, or the Evaluation and Reporting Flow. It sits alongside them as a separate academic demonstration layer used for course evaluation, explanation, and manual verification — not for production search.
