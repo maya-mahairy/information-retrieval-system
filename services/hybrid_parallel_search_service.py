@@ -5,21 +5,12 @@ from services.tfidf_search_service import TFIDFSearchService
 
 
 class HybridParallelSearchService:
-    """
-    Parallel Hybrid Retrieval using rank-based fusion.
-
-    The system runs BM25 and TF-IDF independently, then fuses their ranked
-    results using Weighted Reciprocal Rank Fusion (Weighted RRF).
-    """
 
     def __init__(self):
         self.bm25_service = BM25SearchService()
         self.tfidf_service = TFIDFSearchService()
 
     def _create_or_get_record(self, fused_results: Dict[str, Dict], result: Dict) -> Dict:
-        """
-        Creates a fused result record using doc_id as the unique key.
-        """
         doc_id = str(result.get("doc_id", ""))
 
         if doc_id not in fused_results:
@@ -52,15 +43,6 @@ class HybridParallelSearchService:
         k1: float = 1.5,
         b: float = 0.75,
     ) -> List[Dict]:
-        """
-        Runs BM25 and TF-IDF in parallel, then combines their rankings.
-
-        RRF formula:
-        score += weight / (rrf_k + rank)
-
-        Lower rank number means better position.
-        A document appearing high in one or both lists gets a higher final score.
-        """
         bm25_results = self.bm25_service.search(
             query_text=query_text,
             top_k=bm25_top_k,

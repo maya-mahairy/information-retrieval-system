@@ -18,17 +18,6 @@ from config import (
 
 
 def read_processed_docs(limit: Optional[int] = None):
-    """
-    Reads processed documents from JSONL.
-
-    Each row contains:
-    - doc_id
-    - title
-    - stance
-    - url
-    - original_text
-    - cleaned_text
-    """
     count = 0
 
     with open(PROCESSED_DOCS_PATH, "r", encoding="utf-8") as file:
@@ -44,12 +33,6 @@ def read_processed_docs(limit: Optional[int] = None):
 
 
 def create_document_store(limit: Optional[int] = None, batch_size: int = 1000) -> int:
-    """
-    Creates a SQLite document store.
-
-    The row_id in SQLite matches the row index in the TF-IDF matrix.
-    This allows us to retrieve metadata and original text after ranking.
-    """
     if DOCUMENT_STORE_DB_PATH.exists():
         DOCUMENT_STORE_DB_PATH.unlink()
 
@@ -121,9 +104,6 @@ def create_document_store(limit: Optional[int] = None, batch_size: int = 1000) -
 
 
 def load_cleaned_texts(limit: Optional[int] = None) -> List[str]:
-    """
-    Loads cleaned_text values to build the TF-IDF matrix.
-    """
     texts = []
 
     for doc in tqdm(read_processed_docs(limit=limit), desc="Loading cleaned texts"):
@@ -139,15 +119,6 @@ def build_tfidf_index(
     min_df: int = 2,
     max_df: float = 0.95,
 ):
-    """
-    Builds and saves the TF-IDF vectorizer and matrix.
-
-    Parameters:
-    - limit: use a small number for testing, None for full dataset.
-    - max_features: maximum vocabulary size.
-    - min_df: ignore terms that appear in fewer than min_df documents.
-    - max_df: ignore terms that appear in more than max_df fraction of documents.
-    """
     start_time = time.time()
 
     print("=" * 70)

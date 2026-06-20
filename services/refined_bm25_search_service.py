@@ -5,13 +5,6 @@ from services.query_refinement_service import QueryRefinementService
 
 
 class RefinedBM25SearchService:
-    """
-    BM25 search with Query Refinement.
-
-    Modes:
-    - corrected: uses the spelling-corrected query only.
-    - expanded: uses the synonym-expanded query.
-    """
 
     def __init__(self, mode: str = "corrected"):
         if mode not in {"corrected", "expanded"}:

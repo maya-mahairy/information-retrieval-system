@@ -504,8 +504,8 @@ The project can regenerate these files using the preparation, indexing, evaluati
 | ------ | ----------------------------------------------------------------- |
 | Shdn   | Dataset preparation, dataset loading, and text preprocessing                             |
 | Khaled | TF-IDF indexing/search and BM25 indexing/search                                   |
-| Maya   | Hybrid retrieval, query refinement, Result Clustering service, and Topic Detection service  |
-| Mahmod | Evaluation metrics, model comparison, and chart generation                                  |
+| Maya   | Evaluation metrics, model comparison, chart generation  ,Result Clustering service, and Topic Detection service  |
+| Mahmod | Hybrid retrieval, query refinement,                                  |
 | Sami   | Streamlit UI, documentation, report, and result analysis features |
 
 ---
@@ -517,3 +517,22 @@ This project implements a complete Information Retrieval pipeline starting from 
 The final results show that BM25 is the best practical model due to its strong ranking quality and fast query time, while Hybrid Serial gives slightly better ranking quality at the cost of much higher execution time.
 
 The additional features, including query refinement, embedding-based reranking, result clustering, and topic detection, make the system more useful, explainable, and professional for both users and evaluators.
+/*
+
+cd C:\Users\ASUSD\IR_WORK\IR_Project_2026
+conda activate ir_env
+python -m py_compile app.py
+python tests\test_preprocessing.py
+python tests\test_tfidf_search.py
+python tests\test_bm25_search.py
+python tests\test_bm25_parameters.py
+python tests\test_embedding_search.py
+python tests\test_hybrid_serial_search.py
+python tests\test_hybrid_parallel_search.py
+python tests\test_query_refinement.py
+python tests\test_refined_bm25_search.py
+python tests\test_result_clustering.py
+python tests\test_topic_detection.py
+streamlit run app.py
+
+*/

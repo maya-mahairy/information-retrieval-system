@@ -31,11 +31,6 @@ def evaluate_hybrid_parallel_weights(
     k1: float = 1.5,
     b: float = 0.75,
 ):
-    """
-    Evaluates Hybrid Parallel for one BM25/TF-IDF weight configuration.
-
-    The fusion method is Weighted Reciprocal Rank Fusion.
-    """
     print("\n" + "=" * 70)
     print(
         f"EVALUATING HYBRID PARALLEL | "
@@ -201,9 +196,6 @@ def evaluate_hybrid_parallel_weights(
 
 
 def save_parallel_tuning_outputs(summary_rows: List[Dict], per_query_rows: List[Dict]):
-    """
-    Saves parallel tuning results as JSON and CSV.
-    """
     with open(HYBRID_PARALLEL_TUNING_SUMMARY_PATH, "w", encoding="utf-8") as file:
         json.dump(summary_rows, file, ensure_ascii=False, indent=2)
 
@@ -231,12 +223,6 @@ def run_hybrid_parallel_tuning(
     k1: float = 1.5,
     b: float = 0.75,
 ):
-    """
-    Runs Hybrid Parallel evaluation for multiple BM25/TF-IDF weight settings.
-
-    TF-IDF weight is calculated as:
-    tfidf_weight = 1 - bm25_weight
-    """
     print("=" * 70)
     print("HYBRID PARALLEL TUNING")
     print("=" * 70)

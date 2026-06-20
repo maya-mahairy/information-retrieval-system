@@ -17,21 +17,12 @@ from services.preprocessing_service import preprocess_document, preprocess_query
 
 
 def write_jsonl(path, rows):
-    """
-    Writes rows to a JSONL file.
-    JSONL means: each line is a separate JSON object.
-    This is efficient and suitable for large datasets.
-    """
     with open(path, "w", encoding="utf-8") as file:
         for row in rows:
             file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
 def prepare_queries():
-    """
-    Loads and preprocesses all queries.
-    We use the same preprocessing pipeline used for documents.
-    """
     queries = load_queries()
     processed_queries = []
 
@@ -49,10 +40,6 @@ def prepare_queries():
 
 
 def prepare_qrels():
-    """
-    Loads qrels and saves them locally.
-    Qrels are required for evaluation metrics such as MAP, nDCG, Recall, and Precision@10.
-    """
     qrels = load_qrels()
     qrels_rows = []
     unique_query_ids = set()
@@ -80,13 +67,6 @@ def prepare_qrels():
 
 
 def prepare_docs(limit: Optional[int] = None):
-    """
-    Loads, preprocesses, and saves documents.
-
-    limit:
-    - Use a number like 1000 for a quick test.
-    - Use None to process the full dataset.
-    """
     docs_stream = load_docs_stream()
 
     processed_count = 0
@@ -121,13 +101,6 @@ def prepare_docs(limit: Optional[int] = None):
 
 
 def prepare_all_data(limit: Optional[int] = None):
-    """
-    Runs the full dataset preparation pipeline:
-    - queries
-    - qrels
-    - documents
-    - dataset_info
-    """
     print("=" * 70)
     print("DATASET PREPARATION PIPELINE")
     print("=" * 70)

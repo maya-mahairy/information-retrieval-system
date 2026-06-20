@@ -10,18 +10,12 @@ from services.preprocessing_service import preprocess_text
 
 
 class TFIDFSearchService:
-    """
-    Search service using TF-IDF representation and cosine similarity.
-    """
 
     def __init__(self):
         self.vectorizer = joblib.load(TFIDF_VECTORIZER_PATH)
         self.tfidf_matrix = sparse.load_npz(TFIDF_MATRIX_PATH)
 
     def _get_documents_by_row_ids(self, row_ids: List[int]) -> Dict[int, Dict]:
-        """
-        Fetches document metadata and original text from SQLite by row_id.
-        """
         if not row_ids:
             return {}
 
@@ -55,9 +49,6 @@ class TFIDFSearchService:
         }
 
     def search(self, query_text: str, top_k: int = 10) -> List[Dict]:
-        """
-        Searches documents using TF-IDF cosine similarity.
-        """
         processed_query = preprocess_text(query_text)
         cleaned_query = processed_query["cleaned_text"]
 

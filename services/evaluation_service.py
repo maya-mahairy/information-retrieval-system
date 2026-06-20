@@ -22,9 +22,6 @@ from services.refined_bm25_search_service import RefinedBM25SearchService
 
 
 def load_jsonl(path):
-    """
-    Loads a JSONL file where each line is a JSON object.
-    """
     rows = []
 
     with open(path, "r", encoding="utf-8") as file:
@@ -36,9 +33,6 @@ def load_jsonl(path):
 
 
 def load_queries_by_id() -> Dict[str, Dict]:
-    """
-    Loads processed queries and maps query_id -> query data.
-    """
     queries = load_jsonl(PROCESSED_QUERIES_PATH)
 
     return {
@@ -48,12 +42,6 @@ def load_queries_by_id() -> Dict[str, Dict]:
 
 
 def load_qrels_by_query() -> Dict[str, Dict[str, int]]:
-    """
-    Loads qrels and maps:
-    query_id -> {doc_id -> relevance}
-
-    If the same doc appears more than once for a query, we keep the highest relevance.
-    """
     qrels = load_jsonl(QRELS_PATH)
 
     qrels_by_query = defaultdict(dict)
@@ -70,9 +58,6 @@ def load_qrels_by_query() -> Dict[str, Dict[str, int]]:
 
 
 def get_relevant_docs(qrels_for_query: Dict[str, int]) -> Dict[str, int]:
-    """
-    Keeps only documents with relevance > 0.
-    """
     return {
         doc_id: relevance
         for doc_id, relevance in qrels_for_query.items()
@@ -81,9 +66,6 @@ def get_relevant_docs(qrels_for_query: Dict[str, int]) -> Dict[str, int]:
 
 
 def precision_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: int = 10) -> float:
-    """
-    Precision@K = relevant retrieved documents in top K / K
-    """
     top_k_docs = retrieved_doc_ids[:k]
 
     if not top_k_docs:
@@ -95,9 +77,6 @@ def precision_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], 
 
 
 def recall_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: int = 100) -> float:
-    """
-    Recall@K = relevant retrieved documents in top K / total relevant documents
-    """
     if not relevant_docs:
         return 0.0
 
@@ -108,10 +87,6 @@ def recall_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: 
 
 
 def average_precision_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: int = 100) -> float:
-    """
-    AP@K averages precision values at ranks where a relevant document appears.
-    We treat relevance > 0 as relevant for MAP.
-    """
     if not relevant_docs:
         return 0.0
 
@@ -134,9 +109,6 @@ def average_precision_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str
 
 
 def dcg_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: int = 10) -> float:
-    """
-    DCG@K with graded relevance.
-    """
     dcg = 0.0
 
     for rank, doc_id in enumerate(retrieved_doc_ids[:k], start=1):
@@ -154,9 +126,6 @@ def dcg_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: int
 
 
 def ideal_dcg_at_k(relevant_docs: Dict[str, int], k: int = 10) -> float:
-    """
-    Ideal DCG@K uses the best possible ordering of relevant documents.
-    """
     ideal_relevances = sorted(relevant_docs.values(), reverse=True)[:k]
 
     idcg = 0.0
@@ -170,9 +139,6 @@ def ideal_dcg_at_k(relevant_docs: Dict[str, int], k: int = 10) -> float:
 
 
 def ndcg_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: int = 10) -> float:
-    """
-    nDCG@K = DCG@K / IDCG@K
-    """
     idcg = ideal_dcg_at_k(relevant_docs, k=k)
 
     if idcg == 0:
@@ -182,9 +148,6 @@ def ndcg_at_k(retrieved_doc_ids: List[str], relevant_docs: Dict[str, int], k: in
 
 
 def get_search_service(model_name: str):
-    """
-    Creates the search service for the selected model.
-    """
     model_name = model_name.lower()
 
     if model_name == "tfidf":
@@ -209,9 +172,6 @@ def get_search_service(model_name: str):
 
 
 def run_search(model_name: str, search_service, query_text: str, top_k: int):
-    """
-    Runs search for a model and returns ranked results.
-    """
     if model_name == "bm25":
         return search_service.search(
             query_text=query_text,
@@ -258,9 +218,6 @@ def run_search(model_name: str, search_service, query_text: str, top_k: int):
 
 
 def evaluate_model(model_name: str, top_k: int = 100) -> Tuple[Dict, List[Dict], List[Dict]]:
-    """
-    Evaluates one retrieval model using all queries that appear in qrels.
-    """
     model_name = model_name.lower()
 
     print("\n" + "=" * 70)
@@ -398,9 +355,6 @@ def evaluate_model(model_name: str, top_k: int = 100) -> Tuple[Dict, List[Dict],
 
 
 def save_evaluation_outputs(summaries: List[Dict], per_query_rows: List[Dict], run_details_rows: List[Dict]):
-    """
-    Saves evaluation outputs to JSON, CSV, and JSONL files.
-    """
     with open(EVALUATION_SUMMARY_PATH, "w", encoding="utf-8") as file:
         json.dump(summaries, file, ensure_ascii=False, indent=2)
 
@@ -422,9 +376,6 @@ def save_evaluation_outputs(summaries: List[Dict], per_query_rows: List[Dict], r
 
 
 def evaluate_models(model_names: List[str], top_k: int = 100):
-    """
-    Evaluates selected models and saves all outputs.
-    """
     all_summaries = []
     all_per_query_rows = []
     all_run_details_rows = []

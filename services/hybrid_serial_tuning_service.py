@@ -30,13 +30,6 @@ def evaluate_hybrid_serial_alpha(
     k1: float = 1.5,
     b: float = 0.75,
 ):
-    """
-    Evaluates Hybrid Serial for one alpha value.
-
-    alpha controls the final score:
-    - Higher alpha means BM25 has more influence.
-    - Lower alpha means Embedding has more influence.
-    """
     print("\n" + "=" * 70)
     print(f"EVALUATING HYBRID SERIAL | alpha = {alpha}")
     print("=" * 70)
@@ -188,9 +181,6 @@ def evaluate_hybrid_serial_alpha(
 
 
 def save_tuning_outputs(summary_rows: List[Dict], per_query_rows: List[Dict]):
-    """
-    Saves tuning results as JSON and CSV.
-    """
     with open(HYBRID_SERIAL_TUNING_SUMMARY_PATH, "w", encoding="utf-8") as file:
         json.dump(summary_rows, file, ensure_ascii=False, indent=2)
 
@@ -218,9 +208,6 @@ def run_hybrid_serial_tuning(
     k1: float = 1.5,
     b: float = 0.75,
 ):
-    """
-    Runs Hybrid Serial evaluation for multiple alpha values.
-    """
     print("=" * 70)
     print("HYBRID SERIAL TUNING")
     print("=" * 70)

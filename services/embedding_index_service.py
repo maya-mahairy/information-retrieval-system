@@ -18,10 +18,6 @@ from services.tfidf_index_service import create_document_store, read_processed_d
 
 
 def ensure_document_store_exists(limit: Optional[int] = None):
-    """
-    Embedding search uses the same SQLite document store used by TF-IDF and BM25.
-    row_id in the embedding matrix must match row_id in the document store.
-    """
     if DOCUMENT_STORE_DB_PATH.exists():
         print("Using existing document store:", DOCUMENT_STORE_DB_PATH)
         return
@@ -31,12 +27,6 @@ def ensure_document_store_exists(limit: Optional[int] = None):
 
 
 def prepare_embedding_text(doc: dict) -> str:
-    """
-    Prepares text for semantic embedding.
-
-    We use searchable_text instead of cleaned_text because transformer embeddings work better
-    with natural language than heavily lemmatized text.
-    """
     text = doc.get("searchable_text", "")
 
     if not text:
@@ -50,9 +40,6 @@ def prepare_embedding_text(doc: dict) -> str:
 
 
 def get_docs_count_for_embedding(limit: Optional[int] = None) -> int:
-    """
-    Returns the expected number of vectors to store.
-    """
     if limit is not None:
         return int(limit)
 
@@ -60,9 +47,6 @@ def get_docs_count_for_embedding(limit: Optional[int] = None) -> int:
 
 
 def iter_embedding_batches(limit: Optional[int] = None, batch_size: int = 64):
-    """
-    Yields batches of document texts for embedding.
-    """
     batch_texts = []
     processed_count = 0
 
@@ -82,13 +66,6 @@ def build_embedding_index(
     limit: Optional[int] = None,
     batch_size: int = 64,
 ):
-    """
-    Builds and saves a local vector store.
-
-    The vector store is:
-    - embedding_matrix.npy: dense normalized vectors
-    - document_store.sqlite: metadata and original text
-    """
     start_time = time.time()
 
     print("=" * 70)

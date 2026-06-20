@@ -10,14 +10,6 @@ from config import (
 
 
 def _load_hf_config(config_name: str, streaming: bool = False):
-    """
-    Loads one part of the dataset from the HuggingFace ir-datasets mirror.
-
-    config_name can be:
-    - docs
-    - queries
-    - qrels
-    """
     data = load_dataset(
         HF_DATASET_ID,
         config_name,
@@ -26,8 +18,6 @@ def _load_hf_config(config_name: str, streaming: bool = False):
         trust_remote_code=True,
     )
 
-    # load_dataset may return DatasetDict / IterableDatasetDict.
-    # We select the split with the same name, or the first available split.
     if hasattr(data, "keys"):
         if config_name in data:
             return data[config_name]
@@ -46,10 +36,6 @@ def load_qrels():
 
 
 def load_docs_stream():
-    """
-    Streaming docs avoids downloading all 382K docs just for inspection.
-    Later, when we build indexes, we will process all docs in a controlled step.
-    """
     return _load_hf_config("docs", streaming=True)
 
 

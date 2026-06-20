@@ -13,16 +13,6 @@ stemmer = PorterStemmer()
 
 
 def normalize_text(text: str) -> str:
-    """
-    Normalizes raw text before tokenization.
-
-    Steps:
-    - Convert HTML entities to normal characters.
-    - Lowercase the text.
-    - Remove URLs.
-    - Replace non-alphanumeric characters with spaces.
-    - Remove extra spaces.
-    """
     if text is None:
         return ""
 
@@ -30,38 +20,23 @@ def normalize_text(text: str) -> str:
     text = html.unescape(text)
     text = text.lower()
 
-    # Remove URLs
     text = re.sub(r"https?://\S+|www\.\S+", " ", text)
 
-    # Keep letters and numbers only; replace punctuation/symbols with spaces
     text = re.sub(r"[^a-z0-9\s]", " ", text)
 
-    # Normalize repeated spaces
     text = re.sub(r"\s+", " ", text).strip()
 
     return text
 
 
 def tokenize_text(normalized_text: str) -> List[str]:
-    """
-    Splits normalized text into word tokens.
-
-    We use regex tokenization to keep the preprocessing simple and stable.
-    """
     return re.findall(r"\b[a-z0-9]+\b", normalized_text)
 
 
 def preprocess_tokens(tokens: List[str], use_stemming: bool = False) -> List[str]:
-    """
-    Removes stopwords and applies lemmatization by default.
-
-    Stemming is optional. We keep lemmatization as default because it keeps
-    words more readable and suitable for explanation in the report/interview.
-    """
     processed_tokens = []
 
     for token in tokens:
-        # Remove very short tokens and stopwords
         if len(token) <= 2:
             continue
 
@@ -79,13 +54,6 @@ def preprocess_tokens(tokens: List[str], use_stemming: bool = False) -> List[str
 
 
 def preprocess_text(text: str, use_stemming: bool = False) -> Dict[str, Any]:
-    """
-    Full preprocessing pipeline for any text.
-
-    Returns both the original and cleaned forms to support:
-    - Original text display in UI.
-    - Cleaned text/tokens for retrieval models.
-    """
     original_text = "" if text is None else str(text)
     normalized_text = normalize_text(original_text)
     raw_tokens = tokenize_text(normalized_text)
@@ -101,15 +69,6 @@ def preprocess_text(text: str, use_stemming: bool = False) -> Dict[str, Any]:
 
 
 def build_document_search_text(doc: Dict[str, Any]) -> str:
-    """
-    Builds the searchable text for a document.
-
-    We use title + text because:
-    - title gives the general topic.
-    - text contains the actual argument/content.
-
-    We keep stance and url as metadata for display, not as core searchable text.
-    """
     title = doc.get("title", "")
     text = doc.get("text", "")
 
@@ -117,9 +76,6 @@ def build_document_search_text(doc: Dict[str, Any]) -> str:
 
 
 def preprocess_document(doc: Dict[str, Any], use_stemming: bool = False) -> Dict[str, Any]:
-    """
-    Preprocesses a dataset document while preserving its original metadata.
-    """
     searchable_text = build_document_search_text(doc)
     processed = preprocess_text(searchable_text, use_stemming=use_stemming)
 
@@ -137,13 +93,6 @@ def preprocess_document(doc: Dict[str, Any], use_stemming: bool = False) -> Dict
 
 
 def build_query_search_text(query: Dict[str, Any], use_description: bool = False) -> str:
-    """
-    Builds query text for retrieval.
-
-    By default, we use query['text'] only because this represents the user's actual query.
-    The description/narrative fields are useful for understanding relevance, but using them
-    in retrieval may give the system extra information not available in a real user query.
-    """
     query_text = query.get("text", "")
 
     if use_description:
@@ -158,10 +107,6 @@ def preprocess_query(
     use_stemming: bool = False,
     use_description: bool = False,
 ) -> Dict[str, Any]:
-    """
-    Preprocesses a query using the same pipeline used for documents.
-    This is required to keep query/document representations compatible.
-    """
     query_text = build_query_search_text(query, use_description=use_description)
     processed = preprocess_text(query_text, use_stemming=use_stemming)
 

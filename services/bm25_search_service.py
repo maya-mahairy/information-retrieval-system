@@ -18,11 +18,6 @@ from services.preprocessing_service import preprocess_text
 
 
 class BM25SearchService:
-    """
-    Search service using BM25 scoring.
-
-    BM25 parameters k1 and b can be changed per query.
-    """
 
     def __init__(self):
         self.vectorizer = joblib.load(BM25_COUNT_VECTORIZER_PATH)
@@ -39,9 +34,6 @@ class BM25SearchService:
         self.docs_count = int(self.metadata["docs_count"])
 
     def _get_documents_by_row_ids(self, row_ids: List[int]) -> Dict[int, Dict]:
-        """
-        Fetches document metadata and original text from SQLite by row_id.
-        """
         if not row_ids:
             return {}
 
@@ -75,9 +67,6 @@ class BM25SearchService:
         }
 
     def _get_query_term_indices(self, query_text: str) -> Tuple[List[int], str, List[str]]:
-        """
-        Preprocesses the query and maps its tokens to vocabulary indices.
-        """
         processed_query = preprocess_text(query_text)
         cleaned_query = processed_query["cleaned_text"]
         query_tokens = processed_query["tokens"]
@@ -108,12 +97,6 @@ class BM25SearchService:
         k1: float = None,
         b: float = None,
     ) -> List[Dict]:
-        """
-        Searches documents using BM25.
-
-        k1 controls term frequency saturation.
-        b controls document length normalization.
-        """
         if k1 is None:
             k1 = self.default_k1
 

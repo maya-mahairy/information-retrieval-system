@@ -20,10 +20,6 @@ from services.tfidf_index_service import create_document_store, read_processed_d
 
 
 def ensure_document_store_exists(limit: Optional[int] = None):
-    """
-    BM25 and TF-IDF use the same document store.
-    The document store maps row_id to original document metadata.
-    """
     if DOCUMENT_STORE_DB_PATH.exists():
         print("Using existing document store:", DOCUMENT_STORE_DB_PATH)
         return
@@ -33,9 +29,6 @@ def ensure_document_store_exists(limit: Optional[int] = None):
 
 
 def load_cleaned_texts(limit: Optional[int] = None) -> List[str]:
-    """
-    Loads cleaned_text values from processed_docs.jsonl.
-    """
     texts = []
 
     for doc in tqdm(read_processed_docs(limit=limit), desc="Loading cleaned texts"):
@@ -52,12 +45,6 @@ def build_bm25_index(
     default_k1: float = 1.5,
     default_b: float = 0.75,
 ):
-    """
-    Builds a BM25-ready sparse count index.
-
-    We save raw term frequencies, document lengths, and IDF values.
-    BM25 scores are computed at query time, so k1 and b can be changed per query.
-    """
     start_time = time.time()
 
     print("=" * 70)
@@ -99,7 +86,6 @@ def build_bm25_index(
         1.0 + ((n_docs - document_frequencies + 0.5) / (document_frequencies + 0.5))
     ).astype(np.float32)
 
-    # CSC format is efficient for accessing a term column during BM25 scoring.
     count_matrix_csc = count_matrix_csr.tocsc().astype(np.float32)
 
     print("Count matrix shape:", count_matrix_csc.shape)

@@ -8,23 +8,11 @@ from services.preprocessing_service import normalize_text, tokenize_text
 
 
 class QueryRefinementService:
-    """
-    Conservative Query Refinement Service.
-
-    It improves user queries using:
-    1. Safe spelling correction.
-    2. Controlled synonym expansion.
-    3. Query suggestions.
-
-    The correction is intentionally conservative to avoid damaging valid queries.
-    """
 
     def __init__(self):
         self.vectorizer = joblib.load(BM25_COUNT_VECTORIZER_PATH)
         raw_vocabulary = set(self.vectorizer.vocabulary_.keys())
 
-        # Keep only clean alphabetic words.
-        # This prevents bad corrections like students -> students3.
         self.vocabulary = {
             word
             for word in raw_vocabulary
@@ -33,7 +21,6 @@ class QueryRefinementService:
 
         self.vocabulary_by_first_letter = self._group_vocabulary_by_first_letter()
 
-        # Words that should never be auto-corrected.
         self.protected_terms = {
             "a", "an", "the",
             "is", "are", "am", "be", "being", "been",
@@ -56,7 +43,6 @@ class QueryRefinementService:
             "armed",
         }
 
-        # Manual corrections are safer than relying only on noisy dataset vocabulary.
         self.manual_corrections = {
             "techer": "teacher",
             "techers": "teachers",
@@ -146,15 +132,6 @@ class QueryRefinementService:
         ]
 
     def correct_token(self, token: str) -> str:
-        """
-        Corrects one token safely.
-
-        Priority:
-        1. Manual correction.
-        2. Keep protected terms unchanged.
-        3. Keep valid vocabulary terms unchanged.
-        4. Try conservative fuzzy correction.
-        """
         token = token.lower()
 
         if token in self.manual_corrections:
@@ -186,7 +163,6 @@ class QueryRefinementService:
 
         candidate = matches[0]
 
-        # Extra safety: do not accept strange candidates.
         if not candidate.isalpha():
             return token
 
@@ -226,11 +202,6 @@ class QueryRefinementService:
         }
 
     def expand_query(self, corrected_tokens: List[str]) -> Dict:
-        """
-        Adds controlled synonyms.
-
-        We keep expansion limited to prevent query drift.
-        """
         expanded_tokens = list(corrected_tokens)
         added_terms = []
         seen_terms: Set[str] = set(corrected_tokens)

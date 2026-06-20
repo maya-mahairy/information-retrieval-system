@@ -14,11 +14,6 @@ from config import (
 
 
 class EmbeddingSearchService:
-    """
-    Semantic search service using a local vector store.
-
-    The vectors are normalized, so dot product equals cosine similarity.
-    """
 
     def __init__(self):
         with open(EMBEDDING_METADATA_PATH, "r", encoding="utf-8") as file:
@@ -31,9 +26,6 @@ class EmbeddingSearchService:
         self.docs_count = int(self.metadata["docs_count"])
 
     def _get_documents_by_row_ids(self, row_ids: List[int]) -> Dict[int, Dict]:
-        """
-        Fetches document metadata and original text from SQLite by row_id.
-        """
         if not row_ids:
             return {}
 
@@ -67,9 +59,6 @@ class EmbeddingSearchService:
         }
 
     def search(self, query_text: str, top_k: int = 10) -> List[Dict]:
-        """
-        Searches documents using embedding cosine similarity.
-        """
         query_text = " ".join(str(query_text).split())
 
         if not query_text:

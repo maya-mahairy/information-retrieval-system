@@ -9,23 +9,12 @@ from services.bm25_search_service import BM25SearchService
 
 
 class HybridSerialSearchService:
-    """
-    Serial Hybrid Retrieval:
-    1. BM25 retrieves candidate documents from the full dataset.
-    2. Embedding model reranks only the BM25 candidates.
-
-    This avoids building embeddings for all 382K documents on a local CPU.
-    """
 
     def __init__(self):
         self.bm25_service = BM25SearchService()
         self.embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
 
     def _get_documents_by_row_ids(self, row_ids: List[int]) -> Dict[int, Dict]:
-        """
-        Fetches documents from SQLite using row_id.
-        row_id connects BM25 results with stored document metadata.
-        """
         if not row_ids:
             return {}
 
@@ -60,19 +49,12 @@ class HybridSerialSearchService:
         }
 
     def _prepare_embedding_text(self, document: Dict) -> str:
-        """
-        Prepares natural text for embedding reranking.
-
-        We use title + original text because transformer embeddings understand
-        natural language better than heavily cleaned token text.
-        """
         title = document.get("title", "")
         original_text = document.get("original_text", "")
 
         text = f"{title}. {original_text}".strip()
         text = " ".join(text.split())
 
-        # Keep text short enough for fast CPU reranking.
         return text[:1200]
 
     def search(
@@ -84,14 +66,6 @@ class HybridSerialSearchService:
         b: float = 0.75,
         alpha: float = 0.5,
     ) -> List[Dict]:
-        """
-        Runs Serial Hybrid Search.
-
-        alpha controls the final score:
-        - alpha = 1.0 means BM25 only.
-        - alpha = 0.0 means Embedding only within BM25 candidates.
-        - alpha = 0.5 balances both.
-        """
         bm25_results = self.bm25_service.search(
             query_text=query_text,
             top_k=bm25_candidates,
@@ -142,7 +116,6 @@ class HybridSerialSearchService:
             dtype=np.float32,
         )
 
-        # Normalize BM25 scores to 0..1 before combining with embedding scores.
         if bm25_scores.max() > bm25_scores.min():
             bm25_normalized = (bm25_scores - bm25_scores.min()) / (
                 bm25_scores.max() - bm25_scores.min()
@@ -150,8 +123,6 @@ class HybridSerialSearchService:
         else:
             bm25_normalized = np.ones_like(bm25_scores)
 
-        # Embedding cosine similarity is usually between -1 and 1.
-        # Convert it approximately to 0..1.
         embedding_normalized = (embedding_scores + 1.0) / 2.0
 
         hybrid_scores = alpha * bm25_normalized + (1.0 - alpha) * embedding_normalized
